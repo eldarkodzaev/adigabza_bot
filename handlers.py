@@ -5,7 +5,7 @@ from aiogram.types import Message
 
 from config import NUMERALS_URL, KAB_RUS_DICTIONARY_URL, RANDOM_WORD_URL
 from constants import MESSAGE_MAX_LEN, MIN_NUMBER, MAX_NUMBER
-from utils import to_integer, normalize_message
+from utils import to_integer, normalize_message, enumerate_roman
 
 router = Router()
 
@@ -38,15 +38,22 @@ async def message_handler(msg: Message):
             await msg.answer(f"<i>Число должно быть в диапазоне [{MIN_NUMBER}-{MAX_NUMBER}]</i>")
     else:
         response = requests.get(f"{KAB_RUS_DICTIONARY_URL}{normalize_message(msg.text)}")
-        if results := response.json():
+        if results := response.json()['results']:
             answer = ''
             for index, item in enumerate(results, start=1):
                 translations = item['translations']
-                for translation in translations:
-                    if len(answer) > MESSAGE_MAX_LEN:
-                        break
-                    description = f"{translation['description']}\n" if translation['description'] else ''
-                    answer += f"{index}) <b>{item['word']}</b>\n{translation['translation']}\n{description}\n"
+                if len(translations) > 1:
+                    for index_roman, translation in enumerate_roman(translations):
+                        if len(answer) > MESSAGE_MAX_LEN:
+                            break
+                        description = f"{translation['description']}\n" if translation['description'] else ''
+                        answer += f"{index}) <b>{item['word']} ({index_roman})</b>\n{translation['translation']}\n{description}\n"
+                else:
+                    for translation in translations:
+                        if len(answer) > MESSAGE_MAX_LEN:
+                            break
+                        description = f"{translation['description']}\n" if translation['description'] else ''
+                        answer += f"{index}) <b>{item['word']}</b>\n{translation['translation']}\n{description}\n"
             await msg.answer(answer)
         else:
             await msg.answer("<i>По Вашему запросу ничего не найдено</i>")

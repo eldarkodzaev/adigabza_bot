@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Iterable, Any
 
 
 def to_integer(msg: str) -> Optional[int]:
@@ -14,3 +14,10 @@ def normalize_message(msg: str) -> str:
         if '1' in msg:
             msg = msg.replace('1', 'I')
     return msg
+
+
+ROMAN_DIGITS = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X']
+
+def enumerate_roman(iterable: Iterable[Any]) -> list[tuple]:
+    result = [(index, item) for index, item in zip(ROMAN_DIGITS, iterable)]
+    return result
