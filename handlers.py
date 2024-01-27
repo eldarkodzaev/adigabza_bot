@@ -3,7 +3,7 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 
-from config import NUMERALS_URL, KAB_RUS_DICTIONARY_URL, RANDOM_WORD_URL
+from config_example import NUMERALS_URL, KAB_RUS_DICTIONARY_URL, RANDOM_WORD_URL
 from constants import MESSAGE_MAX_LEN, MIN_NUMBER, MAX_NUMBER
 from utils import to_integer, normalize_message, enumerate_roman
 
