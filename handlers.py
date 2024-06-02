@@ -3,7 +3,7 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 
-from config_example import NUMERALS_URL, KAB_RUS_DICTIONARY_URL, RANDOM_WORD_URL
+from config_prod import NUMERALS_URL, KAB_RUS_DICTIONARY_URL, RANDOM_WORD_URL
 from constants import MESSAGE_MAX_LEN, MIN_NUMBER, MAX_NUMBER
 from utils import to_integer, normalize_message, enumerate_roman
 
@@ -17,7 +17,7 @@ async def start_handler(msg: Message):
 
 @router.message(Command("random"))
 async def random_handler(msg: Message):
-    response = requests.get(f"{RANDOM_WORD_URL}").json()
+    response = requests.get(f"{RANDOM_WORD_URL}", timeout=3.05).json()
     word = response['word']
     translations = response['translations']
     answer = ''
@@ -32,12 +32,12 @@ async def random_handler(msg: Message):
 async def message_handler(msg: Message):
     if number := to_integer(msg.text):
         if number in range(MIN_NUMBER, MAX_NUMBER + 1):
-            response = requests.get(f"{NUMERALS_URL}{number}")
+            response = requests.get(f"{NUMERALS_URL}{number}", timeout=3.05)
             await msg.answer(f"{response.json()['translate_decimal']}")
         else:
             await msg.answer(f"<i>Число должно быть в диапазоне [{MIN_NUMBER}-{MAX_NUMBER}]</i>")
     else:
-        response = requests.get(f"{KAB_RUS_DICTIONARY_URL}{normalize_message(msg.text)}")
+        response = requests.get(f"{KAB_RUS_DICTIONARY_URL}{normalize_message(msg.text)}", timeout=3.05)
         if results := response.json()['results']:
             answer = ''
             for index, item in enumerate(results, start=1):
